@@ -15,11 +15,8 @@ class Settings:
     database_url: str | None = None
     s3_bucket: str | None = None
     s3_region: str | None = None
-    s3_prefix: str = ""
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-2.5-flash"
-    call_back_url: str | None = None
-    backoffice_callback_url: str | None = None
 
 
 def get_settings() -> Settings:
@@ -32,9 +29,6 @@ def get_settings() -> Settings:
         database_url=getenv("DATABASE_URL"),
         s3_bucket=getenv("S3_BUCKET"),
         s3_region=getenv("AWS_REGION"),
-        s3_prefix=getenv("S3_PREFIX", ""),
         gemini_api_key=getenv("GEMINI_API_KEY"),
         gemini_model=getenv("GEMINI_MODEL", "gemini-2.5-flash"),
-        call_back_url=getenv("CALLBACK_URL", ""),
-        backoffice_callback_url=getenv("BACKOFFICE_CALLBACK_URL", ""),
     )
