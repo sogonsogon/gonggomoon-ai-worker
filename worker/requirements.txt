@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+sqlmodel
+sqlalchemy
+psycopg2-binary
+boto3
+google-genai
+pymupdf
+python-dotenv
