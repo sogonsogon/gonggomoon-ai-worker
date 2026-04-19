@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 
 from app.application.dto.dto import BaseJobMessage
 from app.core.enums import JobStatus, JobType
@@ -7,38 +8,38 @@ from app.worker.handlers import JobHandler
 
 
 class WorkerExecutor:
-    def __init__(self, queue: JobQueuePort, handler: JobHandler, callback_client: CallbackPort) -> None:
+    def __init__(
+        self,
+        handler: JobHandler,
+        callback_client: CallbackPort,
+        queue: Optional[JobQueuePort] = None,
+    ) -> None:
         self.queue = queue
         self.handler = handler
         self.callback_client = callback_client
 
-    # 워커가 한 번 작업을 처리하는 메서드입니다.
-    # 큐에서 작업 메시지를 하나 가져와서 처리한 후, 콜백 URL로 결과를 전송합니다.
-    # 처리할 메시지가 없으면 False를 반환하고, 처리했으면 True를 반환합니다.
-    # 이 메서드는 WorkerConsumer에서 주기적으로 호출됩니다.
-    def process_once(self) -> bool:
-        message = self.queue.dequeue()
-        if message is None:
-            return False
-
+    # Cloud Tasks push 방식: 메시지를 직접 받아 처리합니다.
+    # 처리 성공 시 콜백을 전송합니다.
+    # 처리 실패 시:
+    #   - max_attempts 미만이면 예외를 그대로 던져 HTTP 500을 반환 → Cloud Tasks가 재시도
+    #   - max_attempts 이상이면 실패 콜백을 전송하고 정상 반환 → Cloud Tasks 재시도 중단
+    def process_message(self, message: BaseJobMessage) -> None:
         try:
             callback_body = self.handler.handle(message)
             self._send_callback(message, callback_body)
         except Exception as exc:
-            if message.attempt_count < message.max_attempts:
-                message.attempt_count += 1
-                print(
-                    f"Retrying job {message.id} of type {message.job_type}. "
-                    f"Attempt {message.attempt_count}/{message.max_attempts}. Error: {exc}"
-                )
-                self.queue.enqueue(message)
-            else:
+            if message.attempt_count >= message.max_attempts:
                 print(
                     f"Job {message.id} of type {message.job_type} failed after "
                     f"{message.max_attempts} attempts. Error: {exc}"
                 )
                 self._send_failure_callback(message, exc)
-        return True
+            else:
+                print(
+                    f"Job {message.id} of type {message.job_type} failed. "
+                    f"Attempt {message.attempt_count}/{message.max_attempts}. Error: {exc}"
+                )
+                raise
 
     def _send_callback(self, message: BaseJobMessage, body: dict) -> None:
         if message.callback_url:

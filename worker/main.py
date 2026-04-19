@@ -1,10 +1,16 @@
-from app.application.container import worker_executor
-from app.worker.consumer import WorkerConsumer
+import uvicorn
+
+from app.core.config import get_settings
 
 
 def main() -> None:
-    consumer = WorkerConsumer(executor=worker_executor)
-    consumer.run_forever()
+    settings = get_settings()
+    uvicorn.run(
+        "app.api.app:app",
+        host=settings.host,
+        port=settings.port,
+        reload=False,
+    )
 
 
 if __name__ == "__main__":

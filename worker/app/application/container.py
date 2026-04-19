@@ -1,5 +1,4 @@
 from app.core.config import get_settings
-from app.infrastructure.queue.redis_queue import RedisJobQueue
 from app.infrastructure.db.session import create_session_factory
 from app.infrastructure.db.file_asset_repository import SqlAlchemyFileAssetRepository
 from app.infrastructure.db.interview_strategy_repository import SqlAlchemyInterviewStrategyRepository
@@ -21,12 +20,6 @@ from app.worker.executor import WorkerExecutor
 
 settings = get_settings()
 session_factory = create_session_factory(settings.database_url)
-
-###### Worker 관련 의존성 주입 ######
-queue = RedisJobQueue(
-    redis_url=settings.redis_url,
-    queue_key=settings.redis_queue_key,
-)
 
 # S3 파일 스토어 클라이언트 (PDF 파일을 저장하고 읽어오는 역할)
 file_store = (
@@ -120,7 +113,6 @@ job_handler = JobHandler(
 )
 
 worker_executor = WorkerExecutor(
-    queue=queue,
     handler=job_handler,
     callback_client=callback_client,
 )

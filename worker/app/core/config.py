@@ -9,10 +9,9 @@ load_dotenv()
 class Settings:
     service_name: str = "ai-server"
     service_version: str = "0.1.0"
+    host: str = "0.0.0.0"
+    port: int = 8080
     internal_api_key: str = "local-dev-secret"
-    worker_poll_interval_seconds: float = 1.0
-    redis_url: str = "redis://localhost:6379/0"
-    redis_queue_key: str = "ai:jobs"
     database_url: str | None = None
     s3_bucket: str | None = None
     s3_region: str | None = None
@@ -24,14 +23,12 @@ class Settings:
 
 
 def get_settings() -> Settings:
-    poll_interval = float(getenv("WORKER_POLL_INTERVAL_SECONDS", "1.0"))
     return Settings(
         service_name=getenv("SERVICE_NAME", "ai-server"),
         service_version=getenv("SERVICE_VERSION", "0.1.0"),
+        host=getenv("HOST", "0.0.0.0"),
+        port=int(getenv("PORT", "8080")),
         internal_api_key=getenv("INTERNAL_API_KEY", "local-dev-secret"),
-        worker_poll_interval_seconds=poll_interval,
-        redis_url=getenv("REDIS_URL", "redis://localhost:6379/0"),
-        redis_queue_key=getenv("REDIS_QUEUE_KEY", "ai:jobs"),
         database_url=getenv("DATABASE_URL"),
         s3_bucket=getenv("S3_BUCKET"),
         s3_region=getenv("AWS_REGION"),
