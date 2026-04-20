@@ -21,14 +21,17 @@ from app.worker.executor import WorkerExecutor
 settings = get_settings()
 session_factory = create_session_factory(settings.database_url)
 
-# S3 파일 스토어 클라이언트 (PDF 파일을 저장하고 읽어오는 역할)
+# S3 호환 파일 스토어 클라이언트 (Supabase Storage)
 file_store = (
     S3FileStore(
         bucket=settings.s3_bucket,
+        endpoint_url=settings.s3_endpoint_url,
+        access_key=settings.s3_access_key,
+        secret_key=settings.s3_secret_key,
         region=settings.s3_region,
     )
-    if settings.s3_bucket
-    else Exception("S3 버킷 정보가 설정되어 있지 않습니다.")
+    if settings.s3_bucket and settings.s3_endpoint_url and settings.s3_access_key and settings.s3_secret_key
+    else Exception("S3 스토리지 정보(버킷, 엔드포인트, 액세스키, 시크릿키)가 설정되어 있지 않습니다.")
 )
 
 file_asset_repository = SqlAlchemyFileAssetRepository(session_factory=session_factory)

@@ -4,16 +4,22 @@ import boto3
 
 from app.application.ports.ports import FileStorePort
 
-# S3FileStore는 AWS S3에서 PDF 파일을 다운로드하는 구현체입니다.
+# S3FileStore는 S3 호환 스토리지(Supabase Storage 등)에서 파일을 다운로드하는 구현체입니다.
 class S3FileStore(FileStorePort):
     def __init__(
         self,
         bucket: str,
+        endpoint_url: str,
+        access_key: str,
+        secret_key: str,
         region: str | None = None,
     ) -> None:
         self.bucket = bucket
         self.client: BaseClient = boto3.client(
             "s3",
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
             region_name=region,
             config=Config(retries={"max_attempts": 3, "mode": "standard"}),
         )
