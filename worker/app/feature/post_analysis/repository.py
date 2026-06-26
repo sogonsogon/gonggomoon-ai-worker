@@ -1,0 +1,35 @@
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from typing import Optional
+
+from app.feature.post_analysis.model import Post, Company
+
+
+class SqlAlchemyPostRepository:
+    def __init__(self, session_factory: Session):
+        self.session_factory = session_factory
+
+    def get_post_info(self, post_id: int) -> Optional[dict]:
+        with self.session_factory() as session:
+            statement = select(Post).where(Post.id == post_id)
+            post = session.execute(statement).first()
+
+            if post is None:
+                raise ValueError(f"Post not found: {post_id}")
+
+            return dict(post._mapping)
+
+
+class SqlAlchemyCompanyRepository:
+    def __init__(self, session_factory: Session):
+        self.session_factory = session_factory
+
+    def get_company_info(self, company_id: int) -> Optional[dict]:
+        with self.session_factory() as session:
+            statement = select(Company).where(Company.id == company_id)
+            company = session.execute(statement).first()
+
+            if company is None:
+                raise ValueError(f"Company not found: {company_id}")
+
+            return dict(company._mapping)

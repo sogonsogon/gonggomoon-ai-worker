@@ -1,12 +1,12 @@
 import uvicorn
 
-from app.core.config import get_settings
+from app.config.config import get_settings
 
 
 def main() -> None:
     settings = get_settings()
     uvicorn.run(
-        "app.api.app:app",
+        "app.presentation.app:app",
         host=settings.host,
         port=settings.port,
         reload=False,
