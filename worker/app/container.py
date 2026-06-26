@@ -21,16 +21,12 @@ settings = get_settings()
 session_factory = create_session_factory(settings.database_url)
 
 # S3 호환 파일 스토어 클라이언트 (Supabase Storage)
-file_store = (
-    S3FileStore(
-        bucket=settings.s3_bucket,
-        endpoint_url=settings.s3_endpoint_url,
-        access_key=settings.s3_access_key,
-        secret_key=settings.s3_secret_key,
-        region=settings.s3_region,
-    )
-    if settings.s3_bucket and settings.s3_endpoint_url and settings.s3_access_key and settings.s3_secret_key
-    else Exception("S3 스토리지 정보(버킷, 엔드포인트, 액세스키, 시크릿키)가 설정되어 있지 않습니다.")
+file_store = S3FileStore(
+    bucket=settings.s3_bucket,
+    endpoint_url=settings.s3_endpoint_url,
+    access_key=settings.s3_access_key,
+    secret_key=settings.s3_secret_key,
+    region=settings.s3_region,
 )
 
 # --- repositories ---
@@ -42,40 +38,24 @@ post_repository = SqlAlchemyPostRepository(session_factory=session_factory)
 text_extractor = PyMuPdfTextExtractor()
 
 # --- gemini clients ---
-experience_analyzer = (
-    GeminiExperienceAnalyzer(
-        api_key=settings.gemini_api_key,
-        model=settings.gemini_model,
-    )
-    if settings.gemini_api_key
-    else Exception("Gemini API 키가 설정되어 있지 않습니다.")
+experience_analyzer = GeminiExperienceAnalyzer(
+    api_key=settings.gemini_api_key,
+    model=settings.gemini_model,
 )
 
-portfolio_generator = (
-    GeminiPortfolioStrategyGenerator(
-        api_key=settings.gemini_api_key,
-        model=settings.gemini_model,
-    )
-    if settings.gemini_api_key
-    else Exception("Gemini API 키가 설정되어 있지 않습니다.")
+portfolio_generator = GeminiPortfolioStrategyGenerator(
+    api_key=settings.gemini_api_key,
+    model=settings.gemini_model,
 )
 
-interview_generator = (
-    GeminiInterviewStrategyGenerator(
-        api_key=settings.gemini_api_key,
-        model=settings.gemini_model,
-    )
-    if settings.gemini_api_key
-    else Exception("Gemini API 키가 설정되어 있지 않습니다.")
+interview_generator = GeminiInterviewStrategyGenerator(
+    api_key=settings.gemini_api_key,
+    model=settings.gemini_model,
 )
 
-post_analyzer = (
-    GeminiPostAnalyzer(
-        api_key=settings.gemini_api_key,
-        model=settings.gemini_model,
-    )
-    if settings.gemini_api_key
-    else Exception("Gemini API 키가 설정되어 있지 않습니다.")
+post_analyzer = GeminiPostAnalyzer(
+    api_key=settings.gemini_api_key,
+    model=settings.gemini_model,
 )
 
 # --- feature services ---
