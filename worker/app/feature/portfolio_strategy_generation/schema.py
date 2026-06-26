@@ -1,15 +1,34 @@
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Literal, Optional
 
 from app.config.enums import JobType
 from app.task.schema import BaseJobMessage
 
 
-# --- 작업 메시지 ---
+# --- 작업 메시지 (모든 데이터를 인라인으로 받음, DB 조회 없음) ---
+class ExperienceInput(BaseModel):
+    title: str = Field(description="경험 제목")
+    experienceType: Literal["PROJECT", "CAREER", "EDUCATION", "COMPETITION", "OTHER"] = Field(
+        description="경험 유형"
+    )
+    experienceContent: str = Field(description="경험 내용")
+    teamSize: int = Field(description="팀 규모")
+    startDate: Optional[str] = Field(default=None, description="시작일(ISO date), 예: 2024-03-15")
+    endDate: Optional[str] = Field(default=None, description="종료일(ISO date), 예: 2024-09-30")
+    roleType: Optional[str] = Field(default=None, description="역할 유형")
+    impactTier: Optional[str] = Field(default=None, description="기여/임팩트 수준")
+
+
+class PostAnalysisInput(BaseModel):
+    title: str = Field(description="공고 분석 제목")
+    summary: str = Field(description="공고 분석 요약")
+
+
 class PortfolioStrategyGenerationMessage(BaseJobMessage):
-    experiences: list[dict]
+    experiences: list[ExperienceInput]
     position_type: str
     industry_type: str
+    post_analysis: PostAnalysisInput
     job_type: JobType = JobType.PORTFOLIO_STRATEGY_GENERATION
 
 
