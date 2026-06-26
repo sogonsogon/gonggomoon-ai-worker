@@ -1,0 +1,31 @@
+# --- VCS / 메타 ---
+.git
+.gitignore
+.dockerignore
+Dockerfile
+
+# --- 에디터 / 툴링 ---
+.idea
+.vscode
+.claude
+**/.DS_Store
+
+# --- 시크릿 / 환경 (이미지에 절대 포함 금지) ---
+**/.env
+**/*.env
+!**/.env.example
+
+# --- 파이썬 가상환경 / 캐시 ---
+**/.venv
+**/venv
+**/env
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.cache
+
+# --- 문서 (런타임 불필요) ---
+**/*.md
