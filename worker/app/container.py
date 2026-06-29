@@ -59,11 +59,10 @@ post_analyzer = GeminiPostAnalyzer(
 )
 
 # --- feature services ---
-# 경험 추출 (pdf에서 경험을 추출하는 핵심 비즈니스 로직 담당)
+# 경험 추출 (업로드된 문서를 Gemini 멀티모달로 직접 분석하여 경험을 추출)
 experience_service = ExperienceExtractionService(
     file_store=file_store,
     analyzer=experience_analyzer,
-    text_extractor=text_extractor,
     file_asset_repository=file_asset_repository
 )
 

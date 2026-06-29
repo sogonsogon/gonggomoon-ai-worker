@@ -30,6 +30,17 @@ class S3FileStore:
         response = self.client.get_object(Bucket=self.bucket, Key=key)
         return bytes(response["Body"].read())
 
+    def download_with_content_type(self, file_key: str) -> tuple[bytes, str | None]:
+        """파일 바이트와 함께 S3에 저장된 ContentType을 반환한다. (멀티모달 입력용)"""
+        key = file_key
+        print("log : downloading file (with content-type) from S3 with key:", key)
+
+        self.client.head_object(Bucket=self.bucket, Key=key)
+        response = self.client.get_object(Bucket=self.bucket, Key=key)
+        data = bytes(response["Body"].read())
+        content_type = response.get("ContentType")
+        return data, content_type
+
     def _build_key(self, file_asset_id: int) -> str:
         filename = f"{file_asset_id}.pdf"
         return filename
