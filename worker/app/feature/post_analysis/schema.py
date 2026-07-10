@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class PostAnalysisPayload(BaseModel):
+    title: Annotated[str, Field(max_length=30)]
     summary: Annotated[str, Field(max_length=20)]
     company_intro: Annotated[str, Field(max_length=30)]
 
