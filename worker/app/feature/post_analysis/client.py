@@ -9,10 +9,10 @@ class GeminiPostAnalyzer:
         self.client = genai.Client(api_key=api_key)
         self.model = model
 
-    def analyze(self, company_name: str, company_description: str, post_content: str) -> dict[str, Any]:
+    def analyze(self, post_content: str) -> dict[str, Any]:
         print("log : Starting post analysis using GeminiPostAnalyzer")
 
-        prompt = self._create_prompt(company_name, company_description, post_content)
+        prompt = self._create_prompt(post_content)
 
         response = self.client.models.generate_content(
             model=self.model,
@@ -28,7 +28,7 @@ class GeminiPostAnalyzer:
             return response.parsed.model_dump()
         return PostAnalysisPayload.model_validate_json(response.text).model_dump()
 
-    def _create_prompt(self, company_name: str, company_description: str, post_content: str) -> str:
+    def _create_prompt(self, post_content: str) -> str:
 
         schema_text = json.dumps(
             PostAnalysisPayload.model_json_schema(),
@@ -39,12 +39,6 @@ class GeminiPostAnalyzer:
             You analyze the job posting content and extract key information.
 
             Return JSON that MUST match the provided schema exactly.
-
-            Company Name:
-            {company_name}
-
-            Company Description:
-            {company_description}
 
             Job Posting Content:
             {post_content}
@@ -70,7 +64,7 @@ class GeminiPostAnalyzer:
             - If longer, rewrite to fit the limit
 
             company_intro
-            - Company mission or domain inferred from the posting or company name
+            - Company mission or domain inferred from the posting content
             - Maximum 30 Korean characters
 
             rnr

@@ -12,7 +12,6 @@ from app.feature.interview_strategy_generation.client import GeminiInterviewStra
 from app.feature.interview_strategy_generation.repository import SqlAlchemyInterviewStrategyRepository
 from app.feature.interview_strategy_generation.service import InterviewStrategyService
 from app.feature.post_analysis.client import GeminiPostAnalyzer
-from app.feature.post_analysis.repository import SqlAlchemyPostRepository, SqlAlchemyCompanyRepository
 from app.feature.post_analysis.service import PostAnalysisService
 from app.task.dispatcher import Dispatcher
 from app.task.executor import TaskExecutor
@@ -32,8 +31,6 @@ file_store = S3FileStore(
 # --- repositories ---
 file_asset_repository = SqlAlchemyFileAssetRepository(session_factory=session_factory)
 interview_strategy_repository = SqlAlchemyInterviewStrategyRepository(session_factory=session_factory)
-company_repository = SqlAlchemyCompanyRepository(session_factory=session_factory)
-post_repository = SqlAlchemyPostRepository(session_factory=session_factory)
 
 text_extractor = PyMuPdfTextExtractor()
 
@@ -80,11 +77,11 @@ interview_strategy_service = InterviewStrategyService(
     generator=interview_generator
 )
 
-# 공고 분석
+# 공고 분석 (S3에 업로드된 공고 원문을 내려받아 분석)
 post_analysis_service = PostAnalysisService(
     post_analyzer=post_analyzer,
-    company_repository=company_repository,
-    post_repository=post_repository,
+    file_store=file_store,
+    file_asset_repository=file_asset_repository,
 )
 
 callback_client = HttpCallbackClient()
