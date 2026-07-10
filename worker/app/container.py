@@ -7,6 +7,7 @@ from app.shared.client.pdf_text_extractor import PyMuPdfTextExtractor
 from app.feature.experience_extraction.client import GeminiExperienceAnalyzer
 from app.feature.experience_extraction.service import ExperienceExtractionService
 from app.feature.portfolio_strategy_generation.client import GeminiPortfolioStrategyGenerator
+from app.feature.portfolio_strategy_generation.repository import SqlAlchemyPostAnalysisRepository
 from app.feature.portfolio_strategy_generation.service import PortfolioStrategyService
 from app.feature.interview_strategy_generation.client import GeminiInterviewStrategyGenerator
 from app.feature.interview_strategy_generation.repository import SqlAlchemyInterviewStrategyRepository
@@ -31,6 +32,7 @@ file_store = S3FileStore(
 # --- repositories ---
 file_asset_repository = SqlAlchemyFileAssetRepository(session_factory=session_factory)
 interview_strategy_repository = SqlAlchemyInterviewStrategyRepository(session_factory=session_factory)
+post_analysis_repository = SqlAlchemyPostAnalysisRepository(session_factory=session_factory)
 
 text_extractor = PyMuPdfTextExtractor()
 
@@ -65,7 +67,8 @@ experience_service = ExperienceExtractionService(
 
 # 포트폴리오 전략 생성
 portfolio_strategy_service = PortfolioStrategyService(
-    generator=portfolio_generator
+    generator=portfolio_generator,
+    post_analysis_repository=post_analysis_repository,
 )
 
 # 면접 전략 생성

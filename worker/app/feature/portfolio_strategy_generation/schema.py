@@ -28,7 +28,8 @@ class PortfolioStrategyGenerationMessage(BaseJobMessage):
     experiences: list[ExperienceInput]
     position_type: str
     industry_type: str
-    post_analysis: PostAnalysisInput
+    # API 서버의 post_analysis 테이블 ID. 워커가 DB에서 title/summary를 조회해 프롬프트에 사용한다.
+    post_analysis_id: int
     job_type: JobType = JobType.PORTFOLIO_STRATEGY_GENERATION
 
 
