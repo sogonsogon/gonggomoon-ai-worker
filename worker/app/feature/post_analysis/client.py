@@ -59,6 +59,11 @@ class GeminiPostAnalyzer:
             - Do not include markdown, explanations, or extra keys
 
             Field rules:
+            title
+            - Job posting title: company name + role name (e.g. "OO회사 백엔드 개발자 채용")
+            - Maximum 30 Korean characters
+            - If longer, rewrite to fit the limit
+
             summary
             - Job title + experience requirement + company name
             - Maximum 20 Korean characters
