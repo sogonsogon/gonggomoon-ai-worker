@@ -10,13 +10,15 @@ from app.feature.portfolio_strategy_generation.schema import PortfolioStrategyGe
 from app.feature.portfolio_strategy_generation.service import PortfolioStrategyService
 from app.feature.interview_strategy_generation.schema import InterviewStrategyGenerationMessage
 from app.feature.interview_strategy_generation.service import InterviewStrategyService
+from app.feature.post_analysis.schema import PostAnalysisMessage
 from app.feature.post_analysis.service import PostAnalysisService
 
 JobMessage = Union[
     BaseJobMessage,
     ExtractedExperienceMessage,
     PortfolioStrategyGenerationMessage,
-    InterviewStrategyGenerationMessage
+    InterviewStrategyGenerationMessage,
+    PostAnalysisMessage
 ]
 
 class Dispatcher:
@@ -41,7 +43,7 @@ class Dispatcher:
         elif message.job_type == JobType.INTERVIEW_STRATEGY_GENERATION:
             result = self.interview_strategy_service.process(message)
         elif message.job_type == JobType.POST_ANALYSIS:
-            result = self.post_analysis_service.process(message.id)
+            result = self.post_analysis_service.process(message.file_asset_id)
         else:
             raise ValueError(f"Unsupported job type: {message.job_type}")
 

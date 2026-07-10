@@ -5,6 +5,7 @@ from fastapi import APIRouter, Header, HTTPException, Request
 from app.container import task_executor
 from app.task.schema import BaseJobMessage
 from app.feature.experience_extraction.schema import ExtractedExperienceMessage
+from app.feature.post_analysis.schema import PostAnalysisMessage
 from app.feature.interview_strategy_generation.schema import InterviewStrategyGenerationMessage
 from app.feature.portfolio_strategy_generation.schema import PortfolioStrategyGenerationMessage
 from app.config.config import get_settings
@@ -24,7 +25,7 @@ def _parse_message(data: dict) -> BaseJobMessage:
     if job_type == JobType.INTERVIEW_STRATEGY_GENERATION.value:
         return InterviewStrategyGenerationMessage.model_validate(data)
     if job_type == JobType.POST_ANALYSIS.value:
-        return BaseJobMessage.model_validate(data)
+        return PostAnalysisMessage.model_validate(data)
 
     raise ValueError(f"Unsupported job_type: {job_type}")
 

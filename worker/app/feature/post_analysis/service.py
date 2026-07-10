@@ -1,38 +1,30 @@
 from typing import Any
+
+from app.shared.client.file_store import S3FileStore
+from app.shared.db.file_asset import SqlAlchemyFileAssetRepository
 from app.feature.post_analysis.client import GeminiPostAnalyzer
-from app.feature.post_analysis.repository import SqlAlchemyPostRepository, SqlAlchemyCompanyRepository
 
+
+# PostAnalysisService는 S3에 저장된 공고 원문을 내려받아 분석하는 비즈니스 로직을 담당합니다.
+# API 서버가 Tavily로 추출한 공고 원문(rawContent)을 텍스트 파일로 업로드해두고,
+# 그 file_asset_id를 메시지로 전달하면 워커가 S3에서 내려받아 Gemini로 분석합니다.
 class PostAnalysisService:
-    def __init__(self, post_analyzer: GeminiPostAnalyzer, company_repository: SqlAlchemyCompanyRepository, post_repository: SqlAlchemyPostRepository) -> None:
+    def __init__(
+        self,
+        post_analyzer: GeminiPostAnalyzer,
+        file_store: S3FileStore,
+        file_asset_repository: SqlAlchemyFileAssetRepository,
+    ) -> None:
         self.post_analyzer = post_analyzer
-        self.company_repository = company_repository
-        self.post_repository = post_repository
+        self.file_store = file_store
+        self.file_asset_repository = file_asset_repository
 
-    def process(self, post_id: int) -> dict[str, Any]:
-        print(f"log : post ID : {post_id}")
+    def process(self, file_asset_id: int) -> dict[str, Any]:
+        print(f"log : post analysis file asset ID : {file_asset_id}")
 
-        found_post = self.post_repository.get_post_info(post_id=post_id)
-        print(f"found post : {found_post}")
+        file_key = self.file_asset_repository.get_file_key(file_asset_id)
+        file_bytes = self.file_store.download(file_key)
 
-        post = found_post.get("Post")
-        if post is None:
-            raise ValueError(f"Post not found in result: {found_post}")
+        post_content = file_bytes.decode("utf-8", errors="replace")
 
-        post_content = post.original_content
-        company_id = post.company_id
-
-        print(f"log : company ID : {company_id}")
-
-        found_company = self.company_repository.get_company_info(company_id=company_id)
-        company = found_company.get("Company")
-        if company is None:
-            raise ValueError(f"Company not found in result: {found_company}")
-
-        company_name = company.name
-        company_description = company.description
-
-        return self.post_analyzer.analyze(
-            company_name=company_name,
-            company_description=company_description,
-            post_content=post_content
-        )
+        return self.post_analyzer.analyze(post_content=post_content)
