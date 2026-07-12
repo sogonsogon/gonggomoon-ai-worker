@@ -40,10 +40,14 @@ class GeminiPortfolioStrategyGenerator:
     def _create_prompt(
         self,
         experiences: list[ExperienceInput],
-        position_type: str,
-        industry_type: str,
+        position_type: str | None,
+        industry_type: str | None,
         post_analysis: PostAnalysisInput
     ) -> str:
+        # 직무/산업 미지정(None)이면 프롬프트에 "None" 문자열이 새지 않도록 대체 문구를 사용한다.
+        position_label = position_type or "미지정"
+        industry_label = industry_type or "미지정"
+
         experience_str = "\n\n".join(
             [
                 (
@@ -86,8 +90,8 @@ class GeminiPortfolioStrategyGenerator:
             - improvementGuides should contain actionable advice to close gaps against the job posting
 
             Target:
-            - positionType: {position_type}
-            - industryType: {industry_type}
+            - positionType: {position_label}
+            - industryType: {industry_label}
 
             Job Posting Analysis:
             - Title: {post_analysis.title}
