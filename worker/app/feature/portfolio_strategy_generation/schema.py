@@ -26,8 +26,9 @@ class PostAnalysisInput(BaseModel):
 
 class PortfolioStrategyGenerationMessage(BaseJobMessage):
     experiences: list[ExperienceInput]
-    position_type: str
-    industry_type: str
+    # 직무/산업을 지정하지 않는 흐름(예: 마스터)에서는 값이 없을 수 있어 nullable로 받는다.
+    position_type: Optional[str] = None
+    industry_type: Optional[str] = None
     post_analysis: PostAnalysisInput
     job_type: JobType = JobType.PORTFOLIO_STRATEGY_GENERATION
 
