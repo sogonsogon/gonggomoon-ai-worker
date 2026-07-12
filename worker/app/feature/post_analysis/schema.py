@@ -1,6 +1,5 @@
 from typing import List
-from typing_extensions import Annotated
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.config.enums import JobType
 from app.task.schema import BaseJobMessage
@@ -15,13 +14,15 @@ class PostAnalysisMessage(BaseJobMessage):
 
 
 # --- Gemini structured output DTO ---
+# 길이/개수 가이드는 프롬프트로만 유도한다.
+# 하드 제약(max_length)을 걸면 모델 출력이 조금만 벗어나도 작업 전체가 실패하므로 두지 않는다.
 class PostAnalysisPayload(BaseModel):
-    title: Annotated[str, Field(max_length=30)]
-    summary: Annotated[str, Field(max_length=20)]
-    company_intro: Annotated[str, Field(max_length=30)]
+    title: str
+    summary: str
+    company_intro: str
 
-    rnr: Annotated[List[str], Field(max_length=5)]
-    required_skills: Annotated[List[str], Field(max_length=5)]
-    differentiators: Annotated[List[str], Field(max_length=3)]
-    hidden_keywords: Annotated[List[str], Field(max_length=5)]
-    action_items: Annotated[List[str], Field(max_length=3)]
+    rnr: List[str]
+    required_skills: List[str]
+    differentiators: List[str]
+    hidden_keywords: List[str]
+    action_items: List[str]
